@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - vscript_dispatch</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --sidebar-bg: #111827;
+            --sidebar-text: #e5e7eb;
+            --content-bg: #1f2937;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --code-bg: #111827;
+            --code-text: #e2e8f0;
+            --border-color: #374151;
+            --card-bg: #374151;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--content-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .sidebar h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            color: #fff;
+            padding-left: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar h1::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--text-muted);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-links a.active {
+            color: #fff;
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 280px;
+            padding: 4rem 10%;
+            background-color: var(--content-bg);
+            flex: 1;
+            max-width: 900px;
+        }
+
+        section {
+            margin-bottom: 5rem;
+            scroll-margin-top: 2rem;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        p {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            color: var(--text-color);
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            line-height: 1.7;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        p code,
+        li code {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.375rem;
+            font-size: 0.9em;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        /* Callouts */
+        .callout {
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid;
+            background-color: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+        }
+
+        .callout strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .callout.info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary-color);
+            color: #93c5fd;
+        }
+
+        .callout.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+            color: #fcd34d;
+        }
+
+        .callout.tip {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #6ee7b7;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--sidebar-bg);
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 5%;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                z-index: 1001;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--sidebar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">Menu</button>
+
+    <div class="sidebar" id="sidebar">
+        <h1>vscript_dispatch</h1>
+        <ul class="nav-links">
+            <li><a href="#intro" class="active">Introduction</a></li>
+            <li><a href="#install">Installation</a></li>
+            <li><a href="#config-general">Configuration Générale</a></li>
+            <li><a href="#antennas">Les Antennes</a></li>
+            <li><a href="#alerts">Configuration des Alertes</a></li>
+            <li><a href="#sounds">Ajouter des Sons</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+
+        <!-- SECTION: INTRODUCTION -->
+        <section id="intro">
+            <h2>Introduction</h2>
+            <p>Bienvenue dans la documentation officielle de <strong>vscript_dispatch</strong>.</p>
+            <p>Ce script est un système de dispatch interactif et immersif pour les services de police et de sheriff. Il
+                intègre un système d'antennes radio réaliste qui peut être brouillé, un traitement audio dynamique pour
+                simuler les transmissions radio, et une gestion complète des alertes avec une interface moderne.</p>
+
+            <div class="callout tip">
+                <strong>Fonctionnalité Clé :</strong> Le système audio applique des effets de distorsion et de bruitage
+                en temps réel sur les alertes vocales pour une immersion maximale.
+            </div>
+        </section>
+
+        <!-- SECTION: INSTALLATION -->
+        <section id="install">
+            <h2>Installation</h2>
+            <ol>
+                <li>Téléchargez le fichier du script.</li>
+                <li>Glissez le dossier <code>vscript_dispatch</code> dans votre dossier <code>resources</code>.</li>
+                <li>Assurez-vous que les dépendances suivantes sont démarrées avant le script :
+                    <ul>
+                        <li><code>ox_lib</code></li>
+                        <li><code>ox_target</code></li>
+                    </ul>
+                </li>
+                <li>Ajoutez <code>ensure vscript_dispatch</code> dans votre fichier <code>server.cfg</code>.</li>
+            </ol>
+        </section>
+
+        <!-- SECTION: CONFIGURATION GENERALE -->
+        <section id="config-general">
+            <h2>Configuration Générale</h2>
+            <p>Le fichier <code>config.lua</code> contient toutes les options pour personnaliser le comportement du
+                script.</p>
+
+            <h3>Jobs Autorisés</h3>
+            <p>Définissez quels métiers peuvent recevoir les alertes et voir l'interface.</p>
+            <pre>Config.Jobs = {
+    ['police'] = true,
+    ['sheriff'] = true
+}</pre>
+
+            <h3>Effets Audio</h3>
+            <p>Activez ou désactivez le filtre "Talkie-Walkie" (distorsion + bruitage) sur les sons d'alerte.</p>
+            <pre>Config.EnableRadioEffect = true -- true = activé, false = son brut</pre>
+
+            <h3>Paramètres Système</h3>
+            <table>
+                <tr>
+                    <th>Option</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>Config.AlertDelay</code></td>
+                    <td>Délai (en secondes) avant qu'une alerte ne soit envoyée aux joueurs. 0 = instantané.</td>
+                </tr>
+                <tr>
+                    <td><code>Config.AntennaHackDuration</code></td>
+                    <td>Temps nécessaire pour pirater une antenne (en millisecondes). Par défaut : <code>60000</code> (1
+                        minute).</td>
+                </tr>
+                <tr>
+                    <td><code>Config.HistoryToggleKey</code></td>
+                    <td>Touche par défaut pour ouvrir l'historique des appels (ex: 'K').</td>
+                </tr>
+                <tr>
+                    <td><code>Config.AutoDeleteDelay</code></td>
+                    <td>Temps (en minutes) après lequel une alerte est automatiquement supprimée de l'historique.</td>
+                </tr>
+                <tr>
+                    <td><code>Config.AlertGroupingRadius</code></td>
+                    <td>Rayon (en mètres) pour regrouper des alertes similaires (anti-spam).</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- SECTION: ANTENNES -->
+        <section id="antennas">
+            <h2>Les Antennes</h2>
+            <p>Les antennes sont des points stratégiques sur la carte. Si une antenne est piratée, les communications
+                dans sa zone peuvent être affectées.</p>
+
+            <h3>Ajouter une Antenne</h3>
+            <p>Dans <code>Config.Antennas</code>, ajoutez une nouvelle entrée :</p>
+            <pre>{
+    coords = vector4(345.08, 182.86, 131.68, 235.30),
+    district = 'Vinewood', -- Nom du fichier son de zone (sans .ogg)
+    label = 'Antenne Vinewood'
+}</pre>
+
+            <div class="callout info">
+                <strong>Le champ District :</strong> Il doit correspondre au nom d'un fichier son présent dans
+                <code>nui/sounds/</code>. C'est ce son qui sera joué lorsqu'une alerte provient de cette zone (ex:
+                "Secteur Vinewood").
+            </div>
+
+            <p>Vous pouvez également changer le prop utilisé pour l'antenne et le panneau de contrôle :</p>
+            <pre>Config.AntennaModel = `prop_radiomast01`
+Config.ControlPanelModel = `prop_byard_elecbox03`</pre>
+        </section>
+
+        <!-- SECTION: ALERTES -->
+        <section id="alerts">
+            <h2>Configuration des Alertes</h2>
+            <p>C'est ici que vous définissez chaque type d'appel (tirs, vol, braquage, etc.).</p>
+            <p>Chaque alerte est configurée dans la table <code>Config.Alerts</code>.</p>
+
+            <h3>Exemple de Configuration</h3>
+            <pre>['shooting'] = {
+    label = 'Coups de Feu',      -- Titre affiché sur la notification
+    sound = 'Coup_de_feu',       -- Nom du fichier son (sans .ogg)
+    soundDuration = 2460,        -- Durée EXACTE du son en millisecondes
+    duration = 3000,             -- Durée d'affichage de la notification à l'écran
+    chance = 50,                 -- % de chance que l'alerte soit envoyée (0-100). 0 = Toujours.
+    queueable = true,            -- Si true, l'alerte est mise en attente si le signal est perdu
+    blip = {                     -- Configuration du point GPS
+        sprite = 110,            -- ID de l'icône (voir docs FiveM)
+        color = 1,               -- Couleur de l'icône
+        scale = 1.0,             -- Taille
+        text = 'Coups de Feu',   -- Nom du blip sur la carte
+        time = 60                -- Temps avant disparition du blip (secondes)
+    }
+}</pre>
+
+            <h3>Détails des Champs</h3>
+            <ul>
+                <li><strong>sound</strong> : Doit correspondre exactement au nom du fichier dans le dossier
+                    <code>nui/sounds/</code>.
+                </li>
+                <li><strong>soundDuration</strong> : Très important. C'est le temps pendant lequel le script va jouer
+                    l'effet radio. Si cette valeur est trop courte, le son sera coupé. Si elle est trop longue, le
+                    grésillement radio continuera après la voix.</li>
+                <li><strong>chance</strong> : Permet de ne pas spammer la police. Si vous mettez <code>20</code>, il y a
+                    20% de chance que l'alerte parte. <code>0</code> veut dire que l'alerte partira tout le temps (pour
+                    les braquages par exemple).</li>
+            </ul>
+        </section>
+
+        <!-- SECTION: SONS -->
+        <section id="sounds">
+            <h2>Ajouter des Sons (Tutoriel Complet)</h2>
+            <p>Vous voulez ajouter une nouvelle alerte "Cambriolage" avec son propre son ? Suivez le guide.</p>
+
+            <h3>1. Ajouter les fichiers sons</h3>
+            <p>Préparez vos fichiers <code>.ogg</code> et placez-les dans <code>vscript_dispatch/nui/sounds/</code>.</p>
+            <ul>
+                <li><code>cambriolage.ogg</code> (La voix qui dit "Cambriolage en cours")</li>
+                <li><code>secteur_richman.ogg</code> (La voix qui dit "Secteur Richman")</li>
+            </ul>
+
+            <h3>2. Configurer la Zone (Pour le secteur)</h3>
+            <p>Dans <code>Config.Antennas</code>, créez ou modifiez une antenne pour utiliser votre son de zone :</p>
+            <pre>{
+    coords = vector4(-123.45, 678.90, 30.0, 120.0), -- Coordonnées de l'antenne
+    district = 'secteur_richman', -- Nom EXACT de votre fichier son (sans .ogg)
+    label = 'Antenne Richman'
+}</pre>
+
+            <h3>3. Configurer l'Alerte</h3>
+            <p>Dans <code>Config.Alerts</code>, ajoutez votre nouvelle alerte :</p>
+            <pre>['burglary'] = { -- Code unique de l'alerte
+    label = 'Cambriolage',
+    sound = 'cambriolage',     -- Nom EXACT de votre fichier son (sans .ogg)
+    soundDuration = 3500,      -- Durée du son 'cambriolage.ogg' en ms
+    duration = 5000,
+    chance = 0,                -- Toujours déclencher
+    queueable = true,
+    blip = {
+        sprite = 411,
+        color = 5,
+        scale = 1.0,
+        text = 'Cambriolage',
+        time = 90
+    }
+}</pre>
+
+            <div class="callout tip">
+                <strong>Résultat :</strong> Lorsqu'un joueur déclenche l'alerte 'burglary' près de cette antenne, les
+                policiers entendront :<br>
+                <em>[Bruit Radio] ... "Cambriolage en cours" ... "Secteur Richman" ... [Bruit Radio]</em>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Simple navigation interaction
+        const links = document.querySelectorAll('.nav-links a');
+        const sections = document.querySelectorAll('section');
+        const sidebar = document.getElementById('sidebar');
+
+        // Smooth scroll and active state
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            links.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Mobile menu
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+        }
+
+        // Close sidebar on link click (mobile)
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
