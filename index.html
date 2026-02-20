@@ -328,6 +328,7 @@
             <li><a href="#config-general">Configuration Générale</a></li>
             <li><a href="#antennas">Les Antennes</a></li>
             <li><a href="#alerts">Configuration des Alertes</a></li>
+            <li><a href="#chance">Système de Chance Progressive</a></li>
             <li><a href="#sounds">Ajouter des Sons</a></li>
         </ul>
     </div>
@@ -467,10 +468,88 @@ Config.ControlPanelModel = `prop_byard_elecbox03`</pre>
                 <li><strong>soundDuration</strong> : Très important. C'est le temps pendant lequel le script va jouer
                     l'effet radio. Si cette valeur est trop courte, le son sera coupé. Si elle est trop longue, le
                     grésillement radio continuera après la voix.</li>
-                <li><strong>chance</strong> : Permet de ne pas spammer la police. Si vous mettez <code>20</code>, il y a
-                    20% de chance que l'alerte parte. <code>0</code> veut dire que l'alerte partira tout le temps (pour
-                    les braquages par exemple).</li>
+                <li><strong>chance</strong> : Probabilité de déclenchement. Utilise un <strong>système
+                        progressif</strong> : la chance augmente à chaque raté jusqu'à 100%. <code>0</code> = toujours
+                    déclenché. Voir la section <a href="#chance">Système de Chance Progressive</a> pour les détails.
+                </li>
             </ul>
+        </section>
+
+        <!-- SECTION: CHANCE PROGRESSIVE -->
+        <section id="chance">
+            <h2>Système de Chance Progressive</h2>
+            <p>Le champ <code>chance</code> ne fonctionne pas comme un simple tirage indépendant à chaque événement.
+                Il utilise un <strong>système progressif cumulatif</strong> : chaque fois que la chance rate, la
+                probabilité du prochain essai augmente du même montant, jusqu'à atteindre 100% (déclenchement garanti).
+            </p>
+
+            <div class="callout info">
+                <strong>Pourquoi ce système ?</strong> Un tirage indépendant à 20% peut théoriquement rater 10 fois
+                de suite. Avec le système progressif, il est <em>mathématiquement impossible</em> de rater plus de
+                <code>100 / chance</code> fois consécutives.
+            </div>
+
+            <h3>Fonctionnement</h3>
+            <p>À chaque fois qu'un événement est détecté (tir, bagarre, vol...) :</p>
+            <ol>
+                <li>La chance <strong>actuelle</strong> = chance de base + chance accumulée depuis le dernier succès.
+                </li>
+                <li>Un tirage aléatoire est effectué entre 1 et 100.</li>
+                <li>Si le tirage <strong>passe</strong> → l'alerte est envoyée, le compteur est remis à <code>0</code>.
+                </li>
+                <li>Si le tirage <strong>rate</strong> → la chance actuelle est mémorisée pour le prochain essai.</li>
+            </ol>
+
+            <h3>Simulation par valeur de <code>chance</code></h3>
+            <table>
+                <tr>
+                    <th>Valeur</th>
+                    <th>Essai 1</th>
+                    <th>Essai 2</th>
+                    <th>Essai 3</th>
+                    <th>Essai 4</th>
+                    <th>Essai 5</th>
+                </tr>
+                <tr>
+                    <td><code>chance = 20</code></td>
+                    <td>20%</td>
+                    <td>40%</td>
+                    <td>60%</td>
+                    <td>80%</td>
+                    <td><strong>100% ✓</strong></td>
+                </tr>
+                <tr>
+                    <td><code>chance = 30</code></td>
+                    <td>30%</td>
+                    <td>60%</td>
+                    <td>90%</td>
+                    <td><strong>100% ✓</strong></td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><code>chance = 50</code></td>
+                    <td>50%</td>
+                    <td><strong>100% ✓</strong></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><code>chance = 0</code></td>
+                    <td colspan="5">Toujours déclenché (100% immédiat)</td>
+                </tr>
+            </table>
+
+            <h3>Important</h3>
+            <div class="callout warning">
+                <strong>Compteur par joueur :</strong> Le compteur de chance accumulée est <strong>local à chaque
+                    joueur</strong>. Si un joueur tire et rate, c'est son propre compteur qui monte. Un autre joueur
+                n'est pas affecté.
+            </div>
+            <div class="callout tip">
+                <strong>Reset automatique :</strong> Dès qu'une alerte est envoyée avec succès, le compteur de ce
+                type d'alerte repart de zéro. La montée reprend uniquement si de nouveaux ratés surviennent.
+            </div>
         </section>
 
         <!-- SECTION: SONS -->
