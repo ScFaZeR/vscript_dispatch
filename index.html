@@ -356,8 +356,9 @@
                 <li>Glissez le dossier <code>vscript_dispatch</code> dans votre dossier <code>resources</code>.</li>
                 <li>Assurez-vous que les dépendances suivantes sont démarrées avant le script :
                     <ul>
-                        <li><code>ox_lib</code></li>
-                        <li><code>ox_target</code></li>
+                        <li><code>ox_lib</code> (Obligatoire)</li>
+                        <li><code>ox_target</code> ou <code>qb-target</code> (Optionnel, selon votre
+                            `Config.TargetSystem`)</li>
                     </ul>
                 </li>
                 <li>Ajoutez <code>ensure vscript_dispatch</code> dans votre fichier <code>server.cfg</code>.</li>
