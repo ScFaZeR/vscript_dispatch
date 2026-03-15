@@ -326,8 +326,12 @@
             <li><a href="#intro" class="active">Introduction</a></li>
             <li><a href="#install">Installation</a></li>
             <li><a href="#config-general">Configuration Générale</a></li>
+            <li><a href="#backup">Renforts (F5)</a></li>
+            <li><a href="#units">Suivi des Unités (🙋‍♂️)</a></li>
             <li><a href="#antennas">Les Antennes</a></li>
+            <li><a href="#blacklist">Zones de Blacklist</a></li>
             <li><a href="#alerts">Configuration des Alertes</a></li>
+            <li><a href="#npc-shooting">Tirs PNJ</a></li>
             <li><a href="#sounds">Ajouter des Sons</a></li>
             <li><a href="#integration">Intégration Externe</a></li>
         </ul>
@@ -401,13 +405,16 @@
                     <th>Description</th>
                 </tr>
                 <tr>
+                    <td><code>Config.EnableBlips</code></td>
+                    <td>Active ou désactive globalement l'affichage des points d'appel sur la carte.</td>
+                </tr>
+                <tr>
                     <td><code>Config.AlertDelay</code></td>
                     <td>Délai (en secondes) avant qu'une alerte ne soit envoyée aux joueurs. 0 = instantané.</td>
                 </tr>
                 <tr>
                     <td><code>Config.AntennaHackDuration</code></td>
-                    <td>Temps nécessaire pour pirater une antenne (en millisecondes). Par défaut : <code>60000</code> (1
-                        minute).</td>
+                    <td>Temps nécessaire pour pirater une antenne (en millisecondes). Par défaut : <code>60000</code>.</td>
                 </tr>
                 <tr>
                     <td><code>Config.HistoryToggleKey</code></td>
@@ -415,13 +422,30 @@
                 </tr>
                 <tr>
                     <td><code>Config.AutoDeleteDelay</code></td>
-                    <td>Temps (en minutes) après lequel une alerte est automatiquement supprimée de l'historique.</td>
-                </tr>
-                <tr>
-                    <td><code>Config.AlertGroupingRadius</code></td>
-                    <td>Rayon (en mètres) pour regrouper des alertes similaires (anti-spam).</td>
+                    <td>Temps (en minutes) après lequel une alerte est automatiquement supprimée.</td>
                 </tr>
             </table>
+        </section>
+
+        <!-- SECTION: BACKUP -->
+        <section id="backup">
+            <h2>Renforts (Panic Button)</h2>
+            <p>Les agents peuvent demander des renforts immédiats sans ouvrir la tablette grâce à un raccourci clavier.</p>
+            <pre>Config.BackupKey = 'F5'
+Config.BackupCommand = 'dispatch_backup'</pre>
+            <div class="callout tip">
+                <strong>Coordination :</strong> Lorsqu'un agent appuie sur cette touche, une alerte "DEMANDE DE RENFORTS" est envoyée à tous ses collègues avec sa position exacte.
+            </div>
+        </section>
+
+        <!-- SECTION: UNITS -->
+        <section id="units">
+            <h2>Suivi des Unités (🙋‍♂️)</h2>
+            <p>Un système de suivi en temps réel permet de voir qui répond à quel appel.</p>
+            <ul>
+                <li><strong>Indicateur Visuel</strong> : Un emoji 🙋‍♂️ accompagné d'un compteur s'affiche sur les notifications.</li>
+                <li><strong>Notifications d'Acceptation</strong> : Dès qu'un agent accepte un appel, une notification prévient tout le groupe ("L'agent Jean Michel a pris l'appel").</li>
+            </ul>
         </section>
 
         <!-- SECTION: ANTENNES -->
@@ -452,6 +476,27 @@
             <p>Vous pouvez également changer le prop utilisé pour l'antenne et le panneau de contrôle :</p>
             <pre>Config.AntennaModel = `prop_radiomast01`
 Config.ControlPanelModel = `prop_byard_elecbox03`</pre>
+        </section>
+
+        <!-- SECTION: BLACKLIST -->
+        <section id="blacklist">
+            <h2>Zones de Blacklist</h2>
+            <p>Vous pouvez définir des zones géographiques où aucune alerte automatique ne sera envoyée (ex: Paintball, zones d'entraînement).</p>
+            <pre>Config.EnableBlacklistZones = true
+Config.BlacklistZones = {
+    {
+        label = "Paintball",
+        type = "poly", -- 'circle' ou 'poly'
+        points = {     -- Uniquement pour le type 'poly'
+            vector2(-1276.76, -3342.19),
+            vector2(-1235.23, -3368.75),
+            vector2(-1265.45, -3417.19),
+            vector2(-1305.32, -3391.96),
+        },
+        minZ = 10.0,
+        maxZ = 100.0,
+    }
+}</pre>
         </section>
 
         <!-- SECTION: ALERTES -->
@@ -489,6 +534,16 @@ Config.ControlPanelModel = `prop_byard_elecbox03`</pre>
                     20% de chance que l'alerte parte. <code>0</code> veut dire que l'alerte partira tout le temps (pour
                     les braquages par exemple).</li>
             </ul>
+        </section>
+
+        <!-- SECTION: NPC SHOOTING -->
+        <section id="npc-shooting">
+            <h2>Tirs PNJ</h2>
+            <p>Le dispatch peut désormais détecter les coups de feu tirés par les civils ou criminels contrôlés par l'IA.</p>
+            <pre>Config.EnableNPCShootingAlerts = true</pre>
+            <div class="callout warning">
+                <strong>Anti-Spam :</strong> Un cooldown automatique est appliqué pour éviter que chaque balle tirée par un PNJ ne génère une nouvelle notification.
+            </div>
         </section>
 
         <!-- SECTION: SONS -->
